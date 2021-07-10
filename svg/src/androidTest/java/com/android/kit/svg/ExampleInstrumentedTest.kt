@@ -1,4 +1,4 @@
-package com.logicianstudio.svg
+package com.android.kit.svg
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

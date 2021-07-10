@@ -21,7 +21,7 @@
         https://github.com/josefpavlik/svg-android
  */
 
-package com.logicianstudio.svg;
+package com.android.kit.svg;
 
 /**
  * Parses numbers from SVG text. Based on the Batik Number Parser (Apache 2 License).

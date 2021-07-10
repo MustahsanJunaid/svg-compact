@@ -21,7 +21,7 @@
         https://github.com/josefpavlik/svg-android
  */
 
-package com.logicianstudio.svg;
+package com.android.kit.svg;
 
 import java.util.HashMap;
 import java.util.Locale;

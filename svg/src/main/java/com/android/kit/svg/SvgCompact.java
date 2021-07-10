@@ -21,7 +21,7 @@
         https://github.com/josefpavlik/svg-android
  */
 
-package com.logicianstudio.svg;
+package com.android.kit.svg;
 
 import android.annotation.TargetApi;
 import android.content.res.AssetManager;

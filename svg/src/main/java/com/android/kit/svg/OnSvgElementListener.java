@@ -21,27 +21,34 @@
         https://github.com/josefpavlik/svg-android
  */
 
-package com.logicianstudio.svg;
+package com.android.kit.svg;
 
-/**
- * Runtime exception thrown when there is a problem parsing an SVG.
- *
- * @author Larva Labs, LLC
- */
-public class SvgParseException extends RuntimeException {
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.RectF;
 
-    @SuppressWarnings("unused")
-    public SvgParseException(String s) {
-        super(s);
-    }
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
-    @SuppressWarnings("unused")
-    public SvgParseException(String s, Throwable throwable) {
-        super(s, throwable);
-    }
+@SuppressWarnings("unused")
+public interface OnSvgElementListener {
 
-    public SvgParseException(Throwable throwable) {
-        super(throwable);
-    }
+    void onSvgStart(@NonNull Canvas canvas,
+                    @Nullable RectF bounds);
+
+    void onSvgEnd(@NonNull Canvas canvas,
+                  @Nullable RectF bounds);
+
+    <T> T onSvgElement(@Nullable String id,
+                       @NonNull T element,
+                       @Nullable RectF elementBounds,
+                       @NonNull Canvas canvas,
+                       @Nullable RectF canvasBounds,
+                       @Nullable Paint paint);
+
+    <T> void onSvgElementDrawn(@Nullable String id,
+                               @NonNull T element,
+                               @NonNull Canvas canvas,
+                               @Nullable Paint paint);
 
 }

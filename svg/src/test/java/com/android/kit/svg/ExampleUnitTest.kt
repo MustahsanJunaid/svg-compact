@@ -1,4 +1,4 @@
-package com.logicianstudio.svg
+package com.android.kit.svg
 
 import org.junit.Test
 

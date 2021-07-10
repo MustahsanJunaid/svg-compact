@@ -21,7 +21,7 @@
         https://github.com/josefpavlik/svg-android
  */
 
-package com.logicianstudio.svg;
+package com.android.kit.svg;
 
 import android.graphics.Picture;
 import android.graphics.RectF;
