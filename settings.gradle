@@ -1,3 +1,6 @@
 rootProject.name = "SVGCompat"
 include ':app'
 include ':svg'
+
+include ':kit'
+project(':kit').projectDir = new File('../AndroidKit/kit')
