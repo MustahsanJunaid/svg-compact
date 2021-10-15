@@ -7,6 +7,8 @@
     tools:context=".MainActivity">
 
     <androidx.recyclerview.widget.RecyclerView
+        android:padding="4dp"
+        android:clipToPadding="false"
         android:id="@+id/recyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -15,7 +17,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:spanCount="2"
+        app:spanCount="1"
         tools:listitem="@layout/item_svg" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
