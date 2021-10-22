@@ -3,4 +3,4 @@ include ':app'
 include ':svg'
 
 include ':kit'
-project(':kit').projectDir = new File('../AndroidKit/kit')
+project(':kit').projectDir = new File('../Kit/kit')
