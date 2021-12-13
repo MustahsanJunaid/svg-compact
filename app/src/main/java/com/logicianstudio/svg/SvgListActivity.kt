@@ -13,13 +13,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.android.kit.file.createDirectoriesIfNeeded
 import com.android.kit.svg.SvgCompact
-import com.android.kit.ui.activity.ActivityKit
-import com.logicianstudio.svg.databinding.ActivityMainBinding
+import com.android.kit.ui.activity.KitActivity
+import com.logicianstudio.svg.databinding.ActivityListSvgBinding
 import java.io.File
 
-class MainActivity : ActivityKit<ActivityMainBinding>() {
+class SvgListActivity : KitActivity<ActivityListSvgBinding>() {
 
-    override fun onCreateBinding() = ActivityMainBinding.inflate(layoutInflater)
+    override fun onCreateBinding() = ActivityListSvgBinding.inflate(layoutInflater)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

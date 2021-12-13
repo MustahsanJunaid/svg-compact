@@ -107,7 +107,7 @@ public abstract class SvgCompact {
     }
 
     private static String sAssumedUnit;
-    private static HashMap<String, String> sTextDynamic = null;
+    private static HashMap<String, String> textDynamic = null;
 
     private final SvgHandler mSvgHandler;
 
@@ -148,7 +148,7 @@ public abstract class SvgCompact {
 
     @SuppressWarnings("unused")
     public static void prepareTexts(HashMap<String, String> texts) {
-        sTextDynamic = texts;
+        textDynamic = texts;
     }
 
     /**
@@ -421,10 +421,10 @@ public abstract class SvgCompact {
                 throw new SvgParseException(e);
             }
         }
-        SvgPicture result = new SvgPicture(mSvgHandler.mPicture, mSvgHandler.mBounds);
+        SvgPicture result = new SvgPicture(mSvgHandler.picture, mSvgHandler.bounds);
         // Skip bounds if it was an empty pic
-        if (!Float.isInfinite(mSvgHandler.mLimits.top)) {
-            result.setLimits(mSvgHandler.mLimits);
+        if (!Float.isInfinite(mSvgHandler.limits.top)) {
+            result.setLimits(mSvgHandler.limits);
         }
         return result;
     }
@@ -1108,30 +1108,30 @@ public abstract class SvgCompact {
 
     private static class Gradient {
 
-        private String mId;
-        private String mXlink;
-        private boolean mIsLinear;
-        private float mX1, mY1, mX2, mY2;
-        private float mX, mY, mRadius;
-        private ArrayList<Float> mPositions = new ArrayList<>();
-        private ArrayList<Integer> mColors = new ArrayList<>();
-        private Matrix mMatrix = null;
+        private String id;
+        private String xlink;
+        private boolean isLinear;
+        private float x1, y1, x2, y2;
+        private float x, y, radius;
+        private ArrayList<Float> positions = new ArrayList<>();
+        private ArrayList<Integer> colors = new ArrayList<>();
+        private Matrix matrix = null;
 
-        public Shader mShader = null;
-        public boolean mBoundingBox = false;
-        public TileMode mTileMode;
+        public Shader shader = null;
+        public boolean boundingBox = false;
+        public TileMode tileMode;
 
         public void inherit(Gradient parent) {
             Gradient child = this;
-            child.mXlink = parent.mId;
-            child.mPositions = parent.mPositions;
-            child.mColors = parent.mColors;
-            if (child.mMatrix == null) {
-                child.mMatrix = parent.mMatrix;
-            } else if (parent.mMatrix != null) {
-                Matrix m = new Matrix(parent.mMatrix);
-                m.preConcat(child.mMatrix);
-                child.mMatrix = m;
+            child.xlink = parent.id;
+            child.positions = parent.positions;
+            child.colors = parent.colors;
+            if (child.matrix == null) {
+                child.matrix = parent.matrix;
+            } else if (parent.matrix != null) {
+                Matrix m = new Matrix(parent.matrix);
+                m.preConcat(child.matrix);
+                child.matrix = m;
             }
         }
     }
@@ -1255,65 +1255,65 @@ public abstract class SvgCompact {
 
     public static class SvgHandler extends DefaultHandler {
 
-        private final SvgCompact mSvgCompact;
-        private Picture mPicture;
-        private Canvas mCanvas;
-        private Paint mStrokePaint;
-        private boolean mStrokeSet = false;
-        private Stack<Paint> mStrokePaintStack = new Stack<>();
-        private Stack<Boolean> mStrokeSetStack = new Stack<>();
+        private final SvgCompact svgCompact;
+        private Picture picture;
+        private Canvas canvas;
+        private Paint strokePaint;
+        private boolean strokeSet = false;
+        private Stack<Paint> strokePaintStack = new Stack<>();
+        private Stack<Boolean> strokeSetStack = new Stack<>();
 
-        private Paint mFillPaint;
-        private boolean mFillSet = false;
-        private Stack<Paint> mFillPaintStack = new Stack<>();
-        private Stack<Boolean> mFillSetStack = new Stack<>();
+        private Paint fillPaint;
+        private boolean fillSet = false;
+        private Stack<Paint> fillPaintStack = new Stack<>();
+        private Stack<Boolean> fillSetStack = new Stack<>();
 
         // Scratch rect (so we aren't constantly making new ones)
-        private RectF mLine = new RectF();
-        private RectF mRect = new RectF();
-        private RectF mBounds = null;
-        private RectF mLimits = new RectF(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY);
+        private RectF line = new RectF();
+        private RectF rect = new RectF();
+        private RectF bounds = null;
+        private RectF limits = new RectF(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY);
 
-        private Stack<Boolean> mTransformStack = new Stack<>();
-        private Stack<Matrix> mMatrixStack = new Stack<>();
+        private Stack<Boolean> transformStack = new Stack<>();
+        private Stack<Matrix> matrixStack = new Stack<>();
 
-        private HashMap<String, Gradient> mGradientMap = new HashMap<>();
-        private Gradient mGradient = null;
+        private HashMap<String, Gradient> gradientMap = new HashMap<>();
+        private Gradient gradient = null;
 
-        private final Stack<SvgText> mTextStack = new Stack<>();
-        private final Stack<SvgGroup> mGroupStack = new Stack<>();
+        private final Stack<SvgText> textStack = new Stack<>();
+        private final Stack<SvgGroup> groupStack = new Stack<>();
 
-        private HashMap<String, String> mDefs = new HashMap<>();
-        private boolean mReadingDefs = false;
-        private Stack<String> mReadIgnoreStack = new Stack<>();
+        private HashMap<String, String> defs = new HashMap<>();
+        private boolean readingDefs = false;
+        private Stack<String> readIgnoreStack = new Stack<>();
 
         private SvgHandler(SvgCompact svgCompact) {
-            mSvgCompact = svgCompact;
+            this.svgCompact = svgCompact;
         }
 
         private void onSvgStart() {
-            mSvgCompact.onSvgStart(mCanvas, mBounds);
+            svgCompact.onSvgStart(canvas, bounds);
         }
 
         private void onSvgEnd() {
-            mSvgCompact.onSvgEnd(mCanvas, mBounds);
+            svgCompact.onSvgEnd(canvas, bounds);
         }
 
         private <T> T onSvgElement(@Nullable String id,
                                    @NonNull T element,
                                    @Nullable RectF elementBounds,
                                    @Nullable Paint paint) {
-            return mSvgCompact.onSvgElement(id, element, elementBounds, mCanvas, mBounds, paint);
+            return svgCompact.onSvgElement(id, element, elementBounds, canvas, bounds, paint);
         }
 
         private <T> void onSvgElementDrawn(@Nullable String id,
                                            @NonNull T element,
                                            @Nullable Paint paint) {
-            mSvgCompact.onSvgElementDrawn(id, element, mCanvas, paint);
+            svgCompact.onSvgElementDrawn(id, element, canvas, paint);
         }
 
         public void read(InputStream inputStream) {
-            mPicture = new Picture();
+            picture = new Picture();
             try {
                 long start = System.currentTimeMillis();
                 if (inputStream.markSupported()) {
@@ -1334,9 +1334,9 @@ public abstract class SvgCompact {
                 XMLReader xr = sp.getXMLReader();
                 xr.setContentHandler(this);
                 xr.parse(new InputSource(inputStream));
-                if (sTextDynamic != null) {
-                    sTextDynamic.clear();
-                    sTextDynamic = null;
+                if (textDynamic != null) {
+                    textDynamic.clear();
+                    textDynamic = null;
                 }
                 if (LOG_LEVEL >= LOG_LEVEL_INFO) {
                     Log.v(TAG, "Parsing complete inputStream " + (System.currentTimeMillis() - start) + " ms.");
@@ -1350,22 +1350,22 @@ public abstract class SvgCompact {
         @Override
         public void startDocument() throws SAXException {
             // Set up prior to parsing a doc
-            mStrokePaint = new Paint();
-            mStrokePaint.setAntiAlias(true);
-            mStrokePaint.setStyle(Paint.Style.STROKE);
+            strokePaint = new Paint();
+            strokePaint.setAntiAlias(true);
+            strokePaint.setStyle(Paint.Style.STROKE);
 
-            mFillPaint = new Paint();
-            mFillPaint.setAntiAlias(true);
-            mFillPaint.setStyle(Paint.Style.FILL);
+            fillPaint = new Paint();
+            fillPaint.setAntiAlias(true);
+            fillPaint.setStyle(Paint.Style.FILL);
 
-            mMatrixStack.push(new Matrix());
+            matrixStack.push(new Matrix());
         }
 
         @Override
         public void endDocument() throws SAXException {
             // Clean up after parsing a doc
-            mDefs.clear();
-            mMatrixStack.clear();
+            defs.clear();
+            matrixStack.clear();
         }
 
         private final Matrix gradMatrix = new Matrix();
@@ -1379,17 +1379,17 @@ public abstract class SvgCompact {
                 if (fillString.startsWith("url(#")) {
                     // It's a gradient fill, look it up in our map
                     String id = fillString.substring("url(#".length(), fillString.length() - 1);
-                    Gradient g = mGradientMap.get(id);
+                    Gradient g = gradientMap.get(id);
                     Shader shader = null;
                     if (g != null) {
-                        shader = g.mShader;
+                        shader = g.shader;
                     }
                     if (shader != null) {
                         //Util.debug("Found shader!");
-                        mFillPaint.setShader(shader);
+                        fillPaint.setShader(shader);
                         if (boundingBox != null) {
-                            gradMatrix.set(g.mMatrix);
-                            if (g.mBoundingBox) {
+                            gradMatrix.set(g.matrix);
+                            if (g.boundingBox) {
                                 //Log.d(TAG, "gradient is bounding box");
                                 gradMatrix.preTranslate(boundingBox.left, boundingBox.top);
                                 gradMatrix.preScale(boundingBox.width(), boundingBox.height());
@@ -1398,38 +1398,38 @@ public abstract class SvgCompact {
                         }
                     } else {
                         //Log.d(TAG, "Didn't find shader, using black: " + id);
-                        mFillPaint.setShader(null);
-                        doColor(atts, Color.BLACK, true, mFillPaint);
+                        fillPaint.setShader(null);
+                        doColor(atts, Color.BLACK, true, fillPaint);
                     }
                     return true;
                 } else if (fillString.equalsIgnoreCase("none")) {
-                    mFillPaint.setShader(null);
-                    mFillPaint.setColor(Color.TRANSPARENT);
+                    fillPaint.setShader(null);
+                    fillPaint.setColor(Color.TRANSPARENT);
                     // optimization: return false if transparent
                     return false;
                 } else {
-                    mFillPaint.setShader(null);
+                    fillPaint.setShader(null);
                     Integer color = atts.getColor("fill");
                     if (color != null) {
                         color = getMappedColor(color);
-                        doColor(atts, color, true, mFillPaint);
+                        doColor(atts, color, true, fillPaint);
                     } else {
                         if (LOG_LEVEL >= LOG_LEVEL_WARN) {
                             Log.w(TAG, "Unrecognized fill color, using black: " + fillString);
                         }
-                        doColor(atts, Color.BLACK, true, mFillPaint);
+                        doColor(atts, Color.BLACK, true, fillPaint);
                     }
                     return true;
                 }
             } else {
-                if (mFillSet) {
+                if (fillSet) {
                     // If fill is set, inherit from parent
                     // optimization: return false if transparent
-                    return mFillPaint.getColor() != Color.TRANSPARENT;
+                    return fillPaint.getColor() != Color.TRANSPARENT;
                 } else {
                     // Default is black fill
-                    mFillPaint.setShader(null);
-                    mFillPaint.setColor(Color.BLACK);
+                    fillPaint.setShader(null);
+                    fillPaint.setColor(Color.BLACK);
                     return true;
                 }
             }
@@ -1446,7 +1446,7 @@ public abstract class SvgCompact {
             if (fontSize != null) {
                 paint.setTextSize(fontSize);
             }
-            Typeface typeface = setTypeface(atts, props, mSvgCompact.getAssetManager(), paint.getTypeface());
+            Typeface typeface = setTypeface(atts, props, svgCompact.getAssetManager(), paint.getTypeface());
             if (typeface != null) {
                 paint.setTypeface(typeface);
             }
@@ -1464,8 +1464,8 @@ public abstract class SvgCompact {
             String strokeString = atts.getString("stroke");
             if (strokeString != null) {
                 if (strokeString.equalsIgnoreCase("none")) {
-                    mStrokePaint.setShader(null);
-                    mStrokePaint.setColor(Color.TRANSPARENT);
+                    strokePaint.setShader(null);
+                    strokePaint.setColor(Color.TRANSPARENT);
                     // optimization: return false if transparent
                     return false;
                 }
@@ -1474,7 +1474,7 @@ public abstract class SvgCompact {
                 // Set defaults
 
                 if (width != null) {
-                    mStrokePaint.setStrokeWidth(width);
+                    strokePaint.setStrokeWidth(width);
                 }
 
                 String dashArray = atts.getString("stroke-dasharray");
@@ -1484,43 +1484,43 @@ public abstract class SvgCompact {
                     for (int i = 0; i < splitDashArray.length; i++) {
                         intervals[i] = Float.parseFloat(splitDashArray[i]);
                     }
-                    mStrokePaint.setPathEffect(new DashPathEffect(intervals, 0));
+                    strokePaint.setPathEffect(new DashPathEffect(intervals, 0));
                 }
 
                 String linecap = atts.getString("stroke-linecap");
                 if ("round".equals(linecap)) {
-                    mStrokePaint.setStrokeCap(Paint.Cap.ROUND);
+                    strokePaint.setStrokeCap(Paint.Cap.ROUND);
                 } else if ("square".equals(linecap)) {
-                    mStrokePaint.setStrokeCap(Paint.Cap.SQUARE);
+                    strokePaint.setStrokeCap(Paint.Cap.SQUARE);
                 } else if ("butt".equals(linecap)) {
-                    mStrokePaint.setStrokeCap(Paint.Cap.BUTT);
+                    strokePaint.setStrokeCap(Paint.Cap.BUTT);
                 }
                 String linejoin = atts.getString("stroke-linejoin");
                 if ("miter".equals(linejoin)) {
-                    mStrokePaint.setStrokeJoin(Paint.Join.MITER);
+                    strokePaint.setStrokeJoin(Paint.Join.MITER);
                 } else if ("round".equals(linejoin)) {
-                    mStrokePaint.setStrokeJoin(Paint.Join.ROUND);
+                    strokePaint.setStrokeJoin(Paint.Join.ROUND);
                 } else if ("bevel".equals(linejoin)) {
-                    mStrokePaint.setStrokeJoin(Paint.Join.BEVEL);
+                    strokePaint.setStrokeJoin(Paint.Join.BEVEL);
                 }
 
                 // Display the stroke
-                mStrokePaint.setStyle(Paint.Style.STROKE);
+                strokePaint.setStyle(Paint.Style.STROKE);
 
                 if (strokeString.startsWith("url(#")) {
                     // It's a gradient stroke, look it up in our map
                     String id = strokeString.substring("url(#".length(), strokeString.length() - 1);
-                    Gradient g = mGradientMap.get(id);
+                    Gradient g = gradientMap.get(id);
                     Shader shader = null;
                     if (g != null) {
-                        shader = g.mShader;
+                        shader = g.shader;
                     }
                     if (shader != null) {
                         //Util.debug("Found shader!");
-                        mStrokePaint.setShader(shader);
+                        strokePaint.setShader(shader);
                         if (boundingBox != null) {
-                            gradMatrix.set(g.mMatrix);
-                            if (g.mBoundingBox) {
+                            gradMatrix.set(g.matrix);
+                            if (g.boundingBox) {
                                 //Log.d(TAG, "gradient is bounding box");
                                 gradMatrix.preTranslate(boundingBox.left, boundingBox.top);
                                 gradMatrix.preScale(boundingBox.width(), boundingBox.height());
@@ -1532,32 +1532,32 @@ public abstract class SvgCompact {
                         if (LOG_LEVEL >= LOG_LEVEL_WARN) {
                             Log.w(TAG, "Didn't find shader, using black: " + id);
                         }
-                        mStrokePaint.setShader(null);
-                        doColor(atts, Color.BLACK, true, mStrokePaint);
+                        strokePaint.setShader(null);
+                        doColor(atts, Color.BLACK, true, strokePaint);
                         return true;
                     }
                 } else {
                     Integer color = atts.getColor("stroke");
                     if (color != null) {
                         color = getMappedColor(color);
-                        doColor(atts, color, false, mStrokePaint);
+                        doColor(atts, color, false, strokePaint);
                     } else {
                         if (LOG_LEVEL >= LOG_LEVEL_WARN) {
                             Log.w(TAG, "Unrecognized stroke color, using black: " + strokeString);
                         }
-                        doColor(atts, Color.BLACK, true, mStrokePaint);
+                        doColor(atts, Color.BLACK, true, strokePaint);
                     }
                     return true;
                 }
             } else {
-                if (mStrokeSet) {
+                if (strokeSet) {
                     // If stroke is set, inherit from parent
                     // optimization: return false if transparent
-                    return mStrokePaint.getColor() != Color.TRANSPARENT;
+                    return strokePaint.getColor() != Color.TRANSPARENT;
                 } else {
                     // Default is no stroke
-                    mStrokePaint.setShader(null);
-                    mStrokePaint.setColor(Color.TRANSPARENT);
+                    strokePaint.setShader(null);
+                    strokePaint.setColor(Color.TRANSPARENT);
                     // optimization: return false if transparent
                     return false;
                 }
@@ -1566,28 +1566,28 @@ public abstract class SvgCompact {
 
         private Gradient doGradient(boolean isLinear, Attributes atts) {
             Gradient gradient = new Gradient();
-            gradient.mId = getStringAttr("id", atts);
-            gradient.mIsLinear = isLinear;
+            gradient.id = getStringAttr("id", atts);
+            gradient.isLinear = isLinear;
             if (isLinear) {
-                gradient.mX1 = getFloatAttr("x1", atts, 0f);
-                gradient.mX2 = getFloatAttr("x2", atts, 1f);
-                gradient.mY1 = getFloatAttr("y1", atts, 0f);
-                gradient.mY2 = getFloatAttr("y2", atts, 0f);
+                gradient.x1 = getFloatAttr("x1", atts, 0f);
+                gradient.x2 = getFloatAttr("x2", atts, 1f);
+                gradient.y1 = getFloatAttr("y1", atts, 0f);
+                gradient.y2 = getFloatAttr("y2", atts, 0f);
             } else {
-                gradient.mX = getFloatAttr("cx", atts, 0f);
-                gradient.mY = getFloatAttr("cy", atts, 0f);
-                gradient.mRadius = getFloatAttr("r", atts, 0f);
+                gradient.x = getFloatAttr("cx", atts, 0f);
+                gradient.y = getFloatAttr("cy", atts, 0f);
+                gradient.radius = getFloatAttr("r", atts, 0f);
             }
             String transform = getStringAttr("gradientTransform", atts);
             if (transform != null) {
-                gradient.mMatrix = parseTransform(transform);
+                gradient.matrix = parseTransform(transform);
             }
             String spreadMethod = getStringAttr("spreadMethod", atts);
             if (spreadMethod == null) {
                 spreadMethod = "pad";
             }
 
-            gradient.mTileMode = (spreadMethod.equals("reflect")) ? TileMode.MIRROR :
+            gradient.tileMode = (spreadMethod.equals("reflect")) ? TileMode.MIRROR :
                     (spreadMethod.equals("repeat")) ? TileMode.REPEAT :
                             TileMode.CLAMP;
 
@@ -1595,45 +1595,44 @@ public abstract class SvgCompact {
             if (unit == null) {
                 unit = "objectBoundingBox";
             }
-            gradient.mBoundingBox = !unit.equals("userSpaceOnUse");
+            gradient.boundingBox = !unit.equals("userSpaceOnUse");
 
             String xlink = getStringAttr("href", atts);
             if (xlink != null) {
                 if (xlink.startsWith("#")) {
                     xlink = xlink.substring(1);
                 }
-                gradient.mXlink = xlink;
+                gradient.xlink = xlink;
             }
             return gradient;
         }
 
         private void finishGradients() {
-            for (Gradient gradient : mGradientMap.values()) {
-                if (gradient.mXlink != null) {
-                    Gradient parent = mGradientMap.get(gradient.mXlink);
+            for (Gradient gradient : gradientMap.values()) {
+                if (gradient.xlink != null) {
+                    Gradient parent = gradientMap.get(gradient.xlink);
                     if (parent != null) {
                         gradient.inherit(parent);
                     }
                 }
-                int[] colors = new int[gradient.mColors.size()];
+                int[] colors = new int[gradient.colors.size()];
                 for (int i = 0; i < colors.length; i++) {
-                    colors[i] = gradient.mColors.get(i);
+                    colors[i] = gradient.colors.get(i);
                 }
-                float[] positions = new float[gradient.mPositions.size()];
+                float[] positions = new float[gradient.positions.size()];
                 for (int i = 0; i < positions.length; i++) {
-                    positions[i] = gradient.mPositions.get(i);
+                    positions[i] = gradient.positions.get(i);
                 }
                 if (colors.length == 0) {
                     if (LOG_LEVEL >= LOG_LEVEL_WARN) {
-                        Log.w(TAG, "Failed to parse gradient for id " + gradient.mId);
+                        Log.w(TAG, "Failed to parse gradient for id " + gradient.id);
                     }
                 }
-                if (gradient.mIsLinear) {
-                    gradient.mShader = new LinearGradient(gradient.mX1, gradient.mY1, gradient.mX2, gradient.mY2, colors, positions, gradient.mTileMode);
+                if (gradient.isLinear) {
+                    gradient.shader = new LinearGradient(gradient.x1, gradient.y1, gradient.x2, gradient.y2, colors, positions, gradient.tileMode);
                 } else {
-                    gradient.mShader = new RadialGradient(gradient.mX, gradient.mY, gradient.mRadius, colors, positions, gradient.mTileMode);
+                    gradient.shader = new RadialGradient(gradient.x, gradient.y, gradient.radius, colors, positions, gradient.tileMode);
                 }
-
             }
         }
 
@@ -1660,26 +1659,26 @@ public abstract class SvgCompact {
         private boolean boundsMode = false;
 
         private void doLimits(float x, float y) {
-            if (x < mLimits.left) {
-                mLimits.left = x;
+            if (x < limits.left) {
+                limits.left = x;
             }
-            if (x > mLimits.right) {
-                mLimits.right = x;
+            if (x > limits.right) {
+                limits.right = x;
             }
-            if (y < mLimits.top) {
-                mLimits.top = y;
+            if (y < limits.top) {
+                limits.top = y;
             }
-            if (y > mLimits.bottom) {
-                mLimits.bottom = y;
+            if (y > limits.bottom) {
+                limits.bottom = y;
             }
         }
 
         final private RectF limitRect = new RectF();
 
         private void doLimits(RectF box, Paint paint) {
-            Matrix m = mMatrixStack.peek();
+            Matrix m = matrixStack.peek();
             m.mapRect(limitRect, box);
-            float width2 = (paint == null) ? 0 : mStrokePaint.getStrokeWidth() / 2;
+            float width2 = (paint == null) ? 0 : strokePaint.getStrokeWidth() / 2;
             doLimits(limitRect.left - width2, limitRect.top - width2);
             doLimits(limitRect.right + width2, limitRect.bottom + width2);
         }
@@ -1691,36 +1690,36 @@ public abstract class SvgCompact {
         private void pushTransform(Attributes atts) {
             final String transform = getStringAttr("transform", atts);
             boolean pushed = transform != null;
-            mTransformStack.push(pushed);
+            transformStack.push(pushed);
             if (pushed) {
-                mCanvas.save();
+                canvas.save();
                 final Matrix matrix = parseTransform(transform);
                 if (matrix != null) {
-                    mCanvas.concat(matrix);
-                    matrix.postConcat(mMatrixStack.peek());
-                    mMatrixStack.push(matrix);
+                    canvas.concat(matrix);
+                    matrix.postConcat(matrixStack.peek());
+                    matrixStack.push(matrix);
                 }
             }
         }
 
         private void popTransform() {
-            if (mTransformStack.pop()) {
-                mCanvas.restore();
-                mMatrixStack.pop();
+            if (transformStack.pop()) {
+                canvas.restore();
+                matrixStack.pop();
             }
         }
 
         @Override
         public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException {
-            if (!mReadIgnoreStack.empty()) {
+            if (!readIgnoreStack.empty()) {
                 // Ignore
                 return;
             }
             String id = getStringAttr("id", atts);
 
             // Reset paint opacity
-            mStrokePaint.setAlpha(255);
-            mFillPaint.setAlpha(255);
+            strokePaint.setAlpha(255);
+            fillPaint.setAlpha(255);
             // Ignore everything but rectangles in bounds mode
             if (boundsMode) {
                 if (localName.equals("rect")) {
@@ -1734,7 +1733,7 @@ public abstract class SvgCompact {
                     }
                     Float width = getFloatAttr("width", atts);
                     Float height = getFloatAttr("height", atts);
-                    mBounds = new RectF(x, y, x + width, y + height);
+                    bounds = new RectF(x, y, x + width, y + height);
                 }
                 return;
             }
@@ -1770,28 +1769,28 @@ public abstract class SvgCompact {
                         Log.w(TAG, "Element '" + localName + "' does not provide its dimensions; using " + width + "x" + height);
                     }
                 }
-                mBounds = new RectF(x, y, x + width, y + height);
+                bounds = new RectF(x, y, x + width, y + height);
                 //Log.d(TAG, "svg boundaries: " + mBounds);
-                mCanvas = mPicture.beginRecording(
-                        (int) Math.ceil(mBounds.width()),
-                        (int) Math.ceil(mBounds.height()));
-                mCanvas.translate(-mBounds.left, -mBounds.top);
+                canvas = picture.beginRecording(
+                        (int) Math.ceil(bounds.width()),
+                        (int) Math.ceil(bounds.height()));
+                canvas.translate(-bounds.left, -bounds.top);
                 //Log.d(TAG, "canvas size: " + mCanvas.getWidth() + "x" + mCanvas.getHeight());
                 onSvgStart();
             } else if (localName.equals("defs")) {
-                mReadingDefs = true;
+                readingDefs = true;
             } else if (localName.equals("linearGradient")) {
-                mGradient = doGradient(true, atts);
+                gradient = doGradient(true, atts);
             } else if (localName.equals("radialGradient")) {
-                mGradient = doGradient(false, atts);
+                gradient = doGradient(false, atts);
             } else if (localName.equals("stop")) {
-                if (mGradient != null) {
+                if (gradient != null) {
                     Properties props = new Properties(atts);
                     float offset = props.getFloat("offset", 0);
                     Integer color = props.getColor("stop-color");
                     float alpha = props.getFloat("stop-opacity", 1);
                     int alphaInt = Math.round(255 * alpha);
-                    mGradient.mPositions.add(offset);
+                    gradient.positions.add(offset);
 
                     if (color == null) {
                         color = Color.TRANSPARENT; // to avoid null exception
@@ -1800,7 +1799,7 @@ public abstract class SvgCompact {
                     }
 
                     color |= (alphaInt << 24);
-                    mGradient.mColors.add(color);
+                    gradient.colors.add(color);
                 }
             } else if (localName.equals("g")) {
                 Properties props = new Properties(atts);
@@ -1829,32 +1828,32 @@ public abstract class SvgCompact {
                     //       the layer exactly to its size; see issue #6
                     // Apply inverse of matrix to correct for any transformations
                     // It's okay to use getMatrix() here as we may assume its a software layer
-                    Matrix m = mCanvas.getMatrix();
+                    Matrix m = canvas.getMatrix();
                     m.invert(m);
-                    RectF r = new RectF(0, 0, mCanvas.getWidth(), mCanvas.getHeight());
+                    RectF r = new RectF(0, 0, canvas.getWidth(), canvas.getHeight());
                     m.mapRect(r);
                     // Store the layer with the opacity value
-                    mCanvas.saveLayerAlpha(r,
+                    canvas.saveLayerAlpha(r,
                             (int) (255 * opacity), Canvas.ALL_SAVE_FLAG);
                 } else {
-                    mCanvas.save();
+                    canvas.save();
                 }
 
                 pushTransform(atts);
 
-                mFillPaintStack.push(new Paint(mFillPaint));
-                mStrokePaintStack.push(new Paint(mStrokePaint));
-                mFillSetStack.push(mFillSet);
-                mStrokeSetStack.push(mStrokeSet);
+                fillPaintStack.push(new Paint(fillPaint));
+                strokePaintStack.push(new Paint(strokePaint));
+                fillSetStack.push(fillSet);
+                strokeSetStack.push(strokeSet);
 
                 doFill(props, null);
                 doStroke(props, null);
 
-                mFillSet |= (props.getString("fill") != null);
-                mStrokeSet |= (props.getString("stroke") != null);
+                fillSet |= (props.getString("fill") != null);
+                strokeSet |= (props.getString("stroke") != null);
 
                 SvgGroup group = new SvgGroup(id);
-                mGroupStack.push(group);
+                groupStack.push(group);
                 // FIXME compute bounds before drawing?
                 onSvgElement(id, group, null, null);
             } else if (!hidden && localName.equals("rect")) {
@@ -1885,22 +1884,22 @@ public abstract class SvgCompact {
                 }
                 pushTransform(atts);
                 Properties props = new Properties(atts);
-                mRect.set(x, y, x + width, y + height);
-                if (doFill(props, mRect)) {
-                    mRect = onSvgElement(id, mRect, mRect, mFillPaint);
-                    if (mRect != null) {
-                        mCanvas.drawRoundRect(mRect, rx, ry, mFillPaint);
-                        onSvgElementDrawn(id, mRect, mFillPaint);
+                rect.set(x, y, x + width, y + height);
+                if (doFill(props, rect)) {
+                    rect = onSvgElement(id, rect, rect, fillPaint);
+                    if (rect != null) {
+                        canvas.drawRoundRect(rect, rx, ry, fillPaint);
+                        onSvgElementDrawn(id, rect, fillPaint);
                     }
-                    doLimits(mRect);
+                    doLimits(rect);
                 }
-                if (doStroke(props, mRect)) {
-                    mRect = onSvgElement(id, mRect, mRect, mStrokePaint);
-                    if (mRect != null) {
-                        mCanvas.drawRoundRect(mRect, rx, ry, mStrokePaint);
-                        onSvgElementDrawn(id, mRect, mStrokePaint);
+                if (doStroke(props, rect)) {
+                    rect = onSvgElement(id, rect, rect, strokePaint);
+                    if (rect != null) {
+                        canvas.drawRoundRect(rect, rx, ry, strokePaint);
+                        onSvgElementDrawn(id, rect, strokePaint);
                     }
-                    doLimits(mRect, mStrokePaint);
+                    doLimits(rect, strokePaint);
                 }
                 popTransform();
             } else if (!hidden && localName.equals("line")) {
@@ -1909,7 +1908,7 @@ public abstract class SvgCompact {
                 Float y1 = getFloatAttr("y1", atts);
                 Float y2 = getFloatAttr("y2", atts);
                 Properties props = new Properties(atts);
-                if (doStroke(props, mRect)) {
+                if (doStroke(props, rect)) {
                     pushTransform(atts);
 
                     if (x1 == null) x1 = 0f;
@@ -1917,14 +1916,14 @@ public abstract class SvgCompact {
                     if (y1 == null) y1 = 0f;
                     if (y2 == null) y2 = 0f;
 
-                    mLine.set(x1, y1, x2, y2);
-                    mRect.set(mLine);
-                    mLine = onSvgElement(id, mLine, mRect, mStrokePaint);
-                    if (mLine != null) {
-                        mCanvas.drawLine(mLine.left, mLine.top, mLine.right, mLine.bottom, mStrokePaint);
-                        onSvgElementDrawn(id, mLine, mStrokePaint);
+                    line.set(x1, y1, x2, y2);
+                    rect.set(line);
+                    line = onSvgElement(id, line, rect, strokePaint);
+                    if (line != null) {
+                        canvas.drawLine(line.left, line.top, line.right, line.bottom, strokePaint);
+                        onSvgElementDrawn(id, line, strokePaint);
                     }
-                    doLimits(mRect, mStrokePaint);
+                    doLimits(rect, strokePaint);
                     popTransform();
                 }
             } else if (!hidden && (localName.equals("circle") || localName.equals("ellipse"))) {
@@ -1941,22 +1940,22 @@ public abstract class SvgCompact {
                 if (centerX != null && centerY != null && radiusX != null && radiusY != null) {
                     pushTransform(atts);
                     Properties props = new Properties(atts);
-                    mRect.set(centerX - radiusX, centerY - radiusY, centerX + radiusX, centerY + radiusY);
-                    if (doFill(props, mRect)) {
-                        mRect = onSvgElement(id, mRect, mRect, mFillPaint);
-                        if (mRect != null) {
-                            mCanvas.drawOval(mRect, mFillPaint);
-                            onSvgElementDrawn(id, mRect, mFillPaint);
+                    rect.set(centerX - radiusX, centerY - radiusY, centerX + radiusX, centerY + radiusY);
+                    if (doFill(props, rect)) {
+                        rect = onSvgElement(id, rect, rect, fillPaint);
+                        if (rect != null) {
+                            canvas.drawOval(rect, fillPaint);
+                            onSvgElementDrawn(id, rect, fillPaint);
                         }
-                        doLimits(mRect);
+                        doLimits(rect);
                     }
-                    if (doStroke(props, mRect)) {
-                        mRect = onSvgElement(id, mRect, mRect, mStrokePaint);
-                        if (mRect != null) {
-                            mCanvas.drawOval(mRect, mStrokePaint);
-                            onSvgElementDrawn(id, mRect, mStrokePaint);
+                    if (doStroke(props, rect)) {
+                        rect = onSvgElement(id, rect, rect, strokePaint);
+                        if (rect != null) {
+                            canvas.drawOval(rect, strokePaint);
+                            onSvgElementDrawn(id, rect, strokePaint);
                         }
-                        doLimits(mRect, mStrokePaint);
+                        doLimits(rect, strokePaint);
                     }
                     popTransform();
                 }
@@ -1977,22 +1976,22 @@ public abstract class SvgCompact {
                         if (localName.equals("polygon")) {
                             p.close();
                         }
-                        p.computeBounds(mRect, false);
-                        if (doFill(props, mRect)) {
-                            p = onSvgElement(id, p, mRect, mFillPaint);
+                        p.computeBounds(rect, false);
+                        if (doFill(props, rect)) {
+                            p = onSvgElement(id, p, rect, fillPaint);
                             if (p != null) {
-                                mCanvas.drawPath(p, mFillPaint);
-                                onSvgElementDrawn(id, p, mFillPaint);
+                                canvas.drawPath(p, fillPaint);
+                                onSvgElementDrawn(id, p, fillPaint);
                             }
-                            doLimits(mRect);
+                            doLimits(rect);
                         }
-                        if (doStroke(props, mRect)) {
-                            p = onSvgElement(id, p, mRect, mStrokePaint);
+                        if (doStroke(props, rect)) {
+                            p = onSvgElement(id, p, rect, strokePaint);
                             if (p != null) {
-                                mCanvas.drawPath(p, mStrokePaint);
-                                onSvgElementDrawn(id, p, mStrokePaint);
+                                canvas.drawPath(p, strokePaint);
+                                onSvgElementDrawn(id, p, strokePaint);
                             }
-                            doLimits(mRect, mStrokePaint);
+                            doLimits(rect, strokePaint);
                         }
                         popTransform();
                     }
@@ -2000,16 +1999,16 @@ public abstract class SvgCompact {
             } else if (!hidden && localName.equals("path")) {
                 String d = getStringAttr("d", atts);
 
-                if (mReadingDefs) {
-                    mDefs.put(id, getStringAttr("d", atts));
+                if (readingDefs) {
+                    defs.put(id, getStringAttr("d", atts));
                     return;
                 } else if (null == d) {
                     String href = getStringAttr("href", atts);
                     if (href != null && href.startsWith("#")) {
                         href = href.substring(1);
                     }
-                    if (href != null && mDefs.containsKey(href)) {
-                        d = mDefs.get(href);
+                    if (href != null && defs.containsKey(href)) {
+                        d = defs.get(href);
                     }
                     if (null == d) {
                         return;
@@ -2018,29 +2017,29 @@ public abstract class SvgCompact {
                 Path p = doPath(d);
                 pushTransform(atts);
                 Properties props = new Properties(atts);
-                p.computeBounds(mRect, false);
-                if (doFill(props, mRect)) {
-                    p = onSvgElement(id, p, mRect, mFillPaint);
+                p.computeBounds(rect, false);
+                if (doFill(props, rect)) {
+                    p = onSvgElement(id, p, rect, fillPaint);
                     if (p != null) {
-                        mCanvas.drawPath(p, mFillPaint);
-                        onSvgElementDrawn(id, p, mFillPaint);
+                        canvas.drawPath(p, fillPaint);
+                        onSvgElementDrawn(id, p, fillPaint);
                     }
-                    doLimits(mRect);
+                    doLimits(rect);
                 }
-                if (doStroke(props, mRect)) {
-                    p = onSvgElement(id, p, mRect, mStrokePaint);
+                if (doStroke(props, rect)) {
+                    p = onSvgElement(id, p, rect, strokePaint);
                     if (p != null) {
-                        mCanvas.drawPath(p, mStrokePaint);
-                        onSvgElementDrawn(id, p, mStrokePaint);
+                        canvas.drawPath(p, strokePaint);
+                        onSvgElementDrawn(id, p, strokePaint);
                     }
-                    doLimits(mRect, mStrokePaint);
+                    doLimits(rect, strokePaint);
                 }
                 popTransform();
             } else if (!hidden && localName.equals("text")) {
                 pushTransform(atts);
-                mTextStack.push(new SvgText(atts, mTextStack.isEmpty() ? null : mTextStack.peek()));
+                textStack.push(new SvgText(atts, textStack.isEmpty() ? null : textStack.peek()));
             } else if (!hidden && localName.equals("tspan")) {
-                mTextStack.push(new SvgText(atts, mTextStack.isEmpty() ? null : mTextStack.peek()));
+                textStack.push(new SvgText(atts, textStack.isEmpty() ? null : textStack.peek()));
             } else if (!hidden && localName.equals("clipPath")) {
                 hide();
                 if (LOG_LEVEL >= LOG_LEVEL_WARN) {
@@ -2050,7 +2049,7 @@ public abstract class SvgCompact {
                 switch (localName) {
                     case "metadata":
                         // Ignore, including children
-                        mReadIgnoreStack.push(localName);
+                        readIgnoreStack.push(localName);
                         break;
                     default:
                         if (LOG_LEVEL >= LOG_LEVEL_WARN) {
@@ -2065,11 +2064,11 @@ public abstract class SvgCompact {
             String hexColor = String.format("#%06X", (0xFFFFFF & color));
             Log.v(TAG, "Color: "+ hexColor);
             if (hexColor.length() >= 7) {
-                Integer mappedColor = mSvgCompact.colorMap.get(color);
+                Integer mappedColor = svgCompact.colorMap.get(color);
                 if (mappedColor != null) {
                     color = mappedColor;
-                } else if (!mSvgCompact.colorMap.containsKey(color)) {
-                    mSvgCompact.colorMap.put(color, color);
+                } else if (!svgCompact.colorMap.containsKey(color)) {
+                    svgCompact.colorMap.put(color, color);
                 }
             }
             return color;
@@ -2086,30 +2085,30 @@ public abstract class SvgCompact {
 
         @Override
         public void characters(char[] ch, int start, int length) {
-            if (!mTextStack.isEmpty()) {
-                mTextStack.peek().setText(ch, start, length);
+            if (!textStack.isEmpty()) {
+                textStack.peek().setText(ch, start, length);
             }
         }
 
         @Override
         public void endElement(String namespaceURI, String localName, String qName)
                 throws SAXException {
-            if (!mReadIgnoreStack.empty() && localName.equals(mReadIgnoreStack.peek())) {
+            if (!readIgnoreStack.empty() && localName.equals(readIgnoreStack.peek())) {
                 // Ignore
-                mReadIgnoreStack.pop();
+                readIgnoreStack.pop();
                 return;
             }
             switch (localName) {
                 case "svg":
                     onSvgEnd();
-                    mPicture.endRecording();
+                    picture.endRecording();
                     break;
                 case "text":
                 case "tspan":
-                    if (!mTextStack.isEmpty()) {
-                        SvgText text = mTextStack.pop();
+                    if (!textStack.isEmpty()) {
+                        SvgText text = textStack.pop();
                         if (text != null) {
-                            text.render(mCanvas);
+                            text.render(canvas);
                         }
                     }
                     if (localName.equals("text")) {
@@ -2118,16 +2117,16 @@ public abstract class SvgCompact {
                     break;
                 case "linearGradient":
                 case "radialGradient":
-                    if (mGradient.mId != null) {
-                        mGradientMap.put(mGradient.mId, mGradient);
+                    if (gradient.id != null) {
+                        gradientMap.put(gradient.id, gradient);
                     }
                     break;
                 case "defs":
                     finishGradients();
-                    mReadingDefs = false;
+                    readingDefs = false;
                     break;
                 case "g":
-                    SvgGroup group = mGroupStack.pop();
+                    SvgGroup group = groupStack.pop();
                     onSvgElementDrawn(group.id, group, null);
 
                     if (boundsMode) {
@@ -2138,13 +2137,13 @@ public abstract class SvgCompact {
                     // Clear gradient map
                     //gradientRefMap.clear();
                     popTransform();
-                    mFillPaint = mFillPaintStack.pop();
-                    mFillSet = mFillSetStack.pop();
-                    mStrokePaint = mStrokePaintStack.pop();
-                    mStrokeSet = mStrokeSetStack.pop();
+                    fillPaint = fillPaintStack.pop();
+                    fillSet = fillSetStack.pop();
+                    strokePaint = strokePaintStack.pop();
+                    strokeSet = strokeSetStack.pop();
 
                     // Restore the previous canvas
-                    mCanvas.restore();
+                    canvas.restore();
                     break;
                 case "clipPath":
                     // Break out of hidden mode
@@ -2216,7 +2215,7 @@ public abstract class SvgCompact {
                 if (doFill(props, null)) {
                     fill = new TextPaint(parentText != null && parentText.fill != null
                             ? parentText.fill
-                            : mFillPaint);
+                            : fillPaint);
                     // Fix for https://code.google.com/p/android/issues/detail?id=39755
                     fill.setLinearText(true);
                     doText(atts, props, fill);
@@ -2224,7 +2223,7 @@ public abstract class SvgCompact {
                 if (doStroke(props, null)) {
                     stroke = new TextPaint(parentText != null && parentText.stroke != null
                             ? parentText.stroke
-                            : mStrokePaint);
+                            : strokePaint);
                     // Fix for https://code.google.com/p/android/issues/detail?id=39755
                     stroke.setLinearText(true);
                     doText(atts, props, stroke);
@@ -2265,8 +2264,8 @@ public abstract class SvgCompact {
                 } else {
                     text += new String(ch, start, len);
                 }
-                if (sTextDynamic != null && sTextDynamic.containsKey(text)) {
-                    text = sTextDynamic.get(text);
+                if (textDynamic != null && textDynamic.containsKey(text)) {
+                    text = textDynamic.get(text);
                 }
             }
 

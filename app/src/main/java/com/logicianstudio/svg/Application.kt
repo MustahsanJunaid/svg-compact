@@ -1,6 +1,6 @@
 package com.logicianstudio.svg
 
-import com.android.kit.ui.application.ApplicationKit
+import com.android.kit.ui.application.KitApplication
 
-class Application: ApplicationKit() {
+class Application: KitApplication() {
 }
