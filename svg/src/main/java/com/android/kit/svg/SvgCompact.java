@@ -54,6 +54,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.android.kit.svg.model.Gradient;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -1106,35 +1108,35 @@ public abstract class SvgCompact {
         }
     }
 
-    private static class Gradient {
-
-        private String id;
-        private String xlink;
-        private boolean isLinear;
-        private float x1, y1, x2, y2;
-        private float x, y, radius;
-        private ArrayList<Float> positions = new ArrayList<>();
-        private ArrayList<Integer> colors = new ArrayList<>();
-        private Matrix matrix = null;
-
-        public Shader shader = null;
-        public boolean boundingBox = false;
-        public TileMode tileMode;
-
-        public void inherit(Gradient parent) {
-            Gradient child = this;
-            child.xlink = parent.id;
-            child.positions = parent.positions;
-            child.colors = parent.colors;
-            if (child.matrix == null) {
-                child.matrix = parent.matrix;
-            } else if (parent.matrix != null) {
-                Matrix m = new Matrix(parent.matrix);
-                m.preConcat(child.matrix);
-                child.matrix = m;
-            }
-        }
-    }
+//    private static class Gradient {
+//
+//        private String id;
+//        private String xlink;
+//        private boolean isLinear;
+//        private float x1, y1, x2, y2;
+//        private float x, y, radius;
+//        private ArrayList<Float> positions = new ArrayList<>();
+//        private ArrayList<Integer> colors = new ArrayList<>();
+//        private Matrix matrix = null;
+//
+//        public Shader shader = null;
+//        public boolean boundingBox = false;
+//        public TileMode tileMode;
+//
+//        public void inherit(Gradient parent) {
+//            Gradient child = this;
+//            child.xlink = parent.id;
+//            child.positions = parent.positions;
+//            child.colors = parent.colors;
+//            if (child.matrix == null) {
+//                child.matrix = parent.matrix;
+//            } else if (parent.matrix != null) {
+//                Matrix m = new Matrix(parent.matrix);
+//                m.preConcat(child.matrix);
+//                child.matrix = m;
+//            }
+//        }
+//    }
 
     private static class StyleSet {
         HashMap<String, String> styleMap = new HashMap<>();
@@ -2091,8 +2093,7 @@ public abstract class SvgCompact {
         }
 
         @Override
-        public void endElement(String namespaceURI, String localName, String qName)
-                throws SAXException {
+        public void endElement(String namespaceURI, String localName, String qName) throws SAXException {
             if (!readIgnoreStack.empty() && localName.equals(readIgnoreStack.peek())) {
                 // Ignore
                 readIgnoreStack.pop();
