@@ -24,9 +24,11 @@ class SvgListActivity : KitActivity<ActivityListSvgBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        requestPermission(arrayOf(WRITE_EXTERNAL_STORAGE,READ_EXTERNAL_STORAGE)) {
-            (Environment.getExternalStorageDirectory()
-                .toString() + File.separator + getString(R.string.app_name))
+        requestPermission(arrayOf(WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE)) {
+            (
+                Environment.getExternalStorageDirectory()
+                    .toString() + File.separator + getString(R.string.app_name)
+                )
                 .createDirectoriesIfNeeded()?.let { directory ->
                     binding.recyclerView.adapter =
                         Adapter(this, directory.listFiles()?.toList() ?: listOf())
@@ -35,12 +37,10 @@ class SvgListActivity : KitActivity<ActivityListSvgBinding>() {
     }
 }
 
-
 class Adapter(
     private val context: Context,
     private val svgList: List<File>
 ) : RecyclerView.Adapter<Adapter.ViewHolder>() {
-
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val imageView: ImageView = view.findViewById(R.id.imageView)

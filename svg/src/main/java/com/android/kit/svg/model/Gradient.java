@@ -24,7 +24,7 @@ public class Gradient {
         xlink = parent.id;
         positions = parent.positions;
         colors = parent.colors;
-        if (parent.matrix != null) {
+        if (parent.matrix != null && matrix!=null) {
             Matrix m = new Matrix(parent.matrix);
             m.preConcat(matrix);
             matrix = m;

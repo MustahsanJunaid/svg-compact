@@ -1401,7 +1401,7 @@ public abstract class SvgCompact {
                     } else {
                         //Log.d(TAG, "Didn't find shader, using black: " + id);
                         fillPaint.setShader(null);
-                        doColor(atts, Color.BLACK, true, fillPaint);
+                        doColor(atts, getMappedColor(Color.BLACK), true, fillPaint);
                     }
                     return true;
                 } else if (fillString.equalsIgnoreCase("none")) {
@@ -1419,7 +1419,7 @@ public abstract class SvgCompact {
                         if (LOG_LEVEL >= LOG_LEVEL_WARN) {
                             Log.w(TAG, "Unrecognized fill color, using black: " + fillString);
                         }
-                        doColor(atts, Color.BLACK, true, fillPaint);
+                        doColor(atts, getMappedColor(Color.BLACK), true, fillPaint);
                     }
                     return true;
                 }
@@ -1431,7 +1431,7 @@ public abstract class SvgCompact {
                 } else {
                     // Default is black fill
                     fillPaint.setShader(null);
-                    fillPaint.setColor(Color.BLACK);
+                    fillPaint.setColor(getMappedColor(Color.BLACK));
                     return true;
                 }
             }
@@ -1535,7 +1535,7 @@ public abstract class SvgCompact {
                             Log.w(TAG, "Didn't find shader, using black: " + id);
                         }
                         strokePaint.setShader(null);
-                        doColor(atts, Color.BLACK, true, strokePaint);
+                        doColor(atts, getMappedColor(Color.BLACK), true, strokePaint);
                         return true;
                     }
                 } else {
@@ -1547,7 +1547,7 @@ public abstract class SvgCompact {
                         if (LOG_LEVEL >= LOG_LEVEL_WARN) {
                             Log.w(TAG, "Unrecognized stroke color, using black: " + strokeString);
                         }
-                        doColor(atts, Color.BLACK, true, strokePaint);
+                        doColor(atts, getMappedColor(Color.BLACK), true, strokePaint);
                     }
                     return true;
                 }
