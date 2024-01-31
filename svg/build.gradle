@@ -4,10 +4,10 @@ apply plugin: 'kotlin-parcelize'
 android {
 
     namespace 'com.android.kit.svg'
-    compileSdkVersion 33
+    compileSdk 34
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 33
+        targetSdkVersion 34
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'consumer-rules.pro'
