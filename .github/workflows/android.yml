@@ -19,6 +19,22 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         cache: gradle
+        
+    - name: Set up Android SDK
+      uses: ReactiveCircus/android-emulator-runner@v2
+      with:
+          api-level: 29
+          script: ./gradlew connectedCheck
+
+    - name: Cache Gradle packages
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+        restore-keys: |
+            ${{ runner.os }}-gradle-
 
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v2
